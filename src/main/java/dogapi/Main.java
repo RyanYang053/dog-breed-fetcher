@@ -5,24 +5,21 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
+        BreedFetcher fetcher = new CachingBreedFetcher(new BreedFetcherForLocalTesting());
+
         String breed = "hound";
-        BreedFetcher breedFetcher = new CachingBreedFetcher(new BreedFetcherForLocalTesting());
+        int result = getNumberOfSubBreeds(breed, fetcher);
+        System.out.println(breed + " has " + result + " sub breeds");
 
-        try {
-            int result = getNumberOfSubBreeds(breed, breedFetcher);
+        breed = "cat";
+        result = getNumberOfSubBreeds(breed, fetcher);
+        if (result < 0) {
+            System.out.println("Error: Breed not found: " + breed);
+        } else {
             System.out.println(breed + " has " + result + " sub breeds");
-        } catch (BreedFetcher.BreedNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-
-        breed = "cat"; // invalid
-        try {
-            int result = getNumberOfSubBreeds(breed, breedFetcher);
-            System.out.println(breed + " has " + result + " sub breeds");
-        } catch (BreedFetcher.BreedNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
         }
     }
+
 
     /**
      * Return the number of sub breeds that the given dog breed has according to the
@@ -32,9 +29,12 @@ public class Main {
      * @return the number of sub breeds. Zero should be returned if there are no sub breeds
      * returned by the fetcher
      */
-    public static int getNumberOfSubBreeds(String breed, BreedFetcher breedFetcher)
-            throws BreedFetcher.BreedNotFoundException {
-        List<String> subs = breedFetcher.getSubBreeds(breed);
-        return subs.size(); // returns 0 if the list is empty
+    public static int getNumberOfSubBreeds(String breed, BreedFetcher breedFetcher) {
+        try {
+            List<String> subs = breedFetcher.getSubBreeds(breed);
+            return subs.size();           // 0 if no sub-breeds
+        } catch (BreedFetcher.BreedNotFoundException e) {
+            return -1;                    // test expects -1 when invalid
+        }
     }
 }
