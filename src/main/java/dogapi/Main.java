@@ -34,7 +34,7 @@ public class Main {
             List<String> subs = breedFetcher.getSubBreeds(breed);
             return subs.size();           // 0 if no sub-breeds
         } catch (BreedFetcher.BreedNotFoundException e) {
-            return -1;                    // test expects -1 when invalid
+            return 0;                    // test expects -1 when invalid
         }
     }
 }
